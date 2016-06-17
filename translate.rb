@@ -16,10 +16,6 @@ class Runner
       if node.class == Nokogiri::XML::Text
         string = node.text.strip
 
-        #if node.text.match(/\bBALISE\b/)
-        #  node.text.gsub(/\bBALISE\b/, '<%')
-        #end
-
         if (string !~ /OPEN_DISPLAY_BALISE/ && string !~ /OPEN_BALISE/ && string !~ /CLOSE_BALISE/) && string.length > 2
           puts "Change text: < #{string} > [y/n]"
           answer = $stdin.gets.strip
@@ -33,7 +29,11 @@ class Runner
         end
       end
     end
-    puts doc
+    @new_doc = doc.to_html.gsub(/OPEN_DISPLAY_BALISE/, '<%=')
+    @new_doc.gsub!(/OPEN_BALISE/, '<%')
+    @new_doc.gsub!(/CLOSE_BALISE/, '%>')
+    puts @new_doc
+
   end
 end
 
