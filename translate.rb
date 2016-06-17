@@ -6,10 +6,12 @@ FILE = ARGV[0]
 class Runner
   def parse
     file_to_translate = File.read(FILE)
-    file_to_translate.gsub!(/<%=/, 'OPEN_DISPLAY_BALISE')
-    file_to_translate.gsub!(/<%/, 'OPEN_BALISE')
-    file_to_translate.gsub!(/%>/, 'CLOSE_BALISE')
-    file_with_erb_tags_escaped = file_to_translate
+
+    file_with_erb_tags_escaped =
+      replacements.inject(file_to_translate) do |string, mapping|
+        string.gsub(*mapping)
+      end
+
     doc = Nokogiri::HTML(file_with_erb_tags_escaped)
 
     doc.traverse do |node|
@@ -34,6 +36,16 @@ class Runner
     @new_doc.gsub!(/CLOSE_BALISE/, '%>')
     puts @new_doc
 
+  end
+
+  private
+
+  def replacements
+    {
+      /<%=/ => 'OPEN_DISPLAY_BALISE',
+      /<%/ => 'OPEN_BALISE',
+      /%>/ => 'CLOSE_BALISE '
+    }
   end
 end
 
