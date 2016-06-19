@@ -6,14 +6,16 @@ FILE = ARGV[0]
 class Runner
   def parse
     file_to_translate = File.read(FILE)
-    file_with_erb_tags_escaped = file_to_translate.gsub(/<%([^%]*)%>/, 'BALISE\1BALISE')
+
+    file_with_erb_tags_escaped = transform_text(replace_tags_with_words, file_to_translate)
+
     doc = Nokogiri::HTML(file_with_erb_tags_escaped)
 
     doc.traverse do |node|
       if node.class == Nokogiri::XML::Text
         string = node.text.strip
 
-        if (string !~ /BALISE/) && string.length > 2
+        if (string !~ /OPEN_DISPLAY_BALISE/ && string !~ /OPEN_BALISE/ && string !~ /CLOSE_BALISE/) && string.length > 2
           puts "Change text: < #{string} > [y/n]"
           answer = $stdin.gets.strip
 
@@ -24,10 +26,35 @@ class Runner
 
           node.content = "replaced!" if answer == 'y'
         end
-
       end
     end
-    puts doc
+
+    new_doc = transform_text(replace_words_with_tags, doc.to_html)
+    puts new_doc
+  end
+
+  def transform_text(replacements, text_to_change)
+    replacements.inject(text_to_change) do |string, mapping|
+      string.gsub(*mapping)
+    end
+  end
+
+  private
+
+  def replace_tags_with_words
+    {
+      /<%=/ => 'OPEN_DISPLAY_BALISE',
+      /<%/ => 'OPEN_BALISE',
+      /%>/ => 'CLOSE_BALISE '
+    }
+  end
+
+  def replace_words_with_tags
+    {
+      /OPEN_DISPLAY_BALISE/ => '<%=',
+      /OPEN_BALISE/ => '<%',
+      /CLOSE_BALISE/ => '%>'
+    }
   end
 end
 
