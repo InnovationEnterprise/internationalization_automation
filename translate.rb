@@ -10,6 +10,7 @@ class Runner
     file_with_erb_tags_escaped = transform_text(replace_tags_with_words, file_to_translate)
 
     doc = Nokogiri::HTML(file_with_erb_tags_escaped)
+    translations = []
 
     doc.traverse do |node|
       if node.class == Nokogiri::XML::Text
@@ -28,6 +29,7 @@ class Runner
             puts 'Enter new ref with only downcase and underscore : For example new_translation_test'
             new_string = $stdin.gets.strip
             node.content = "OPEN_DISPLAY_BALISE t(.#{new_string}) CLOSE_BALISE"
+            translations.push("t(.#{new_string})")
           end
         end
       end
