@@ -7,10 +7,7 @@ class Runner
   def parse
     file_to_translate = File.read(FILE)
 
-    file_with_erb_tags_escaped =
-      replacements.inject(file_to_translate) do |string, mapping|
-        string.gsub(*mapping)
-      end
+    file_with_erb_tags_escaped = transform_text(replace_tags_with_words, file_to_translate)
 
     doc = Nokogiri::HTML(file_with_erb_tags_escaped)
 
@@ -31,20 +28,32 @@ class Runner
         end
       end
     end
-    @new_doc = doc.to_html.gsub(/OPEN_DISPLAY_BALISE/, '<%=')
-    @new_doc.gsub!(/OPEN_BALISE/, '<%')
-    @new_doc.gsub!(/CLOSE_BALISE/, '%>')
-    puts @new_doc
 
+    new_doc = transform_text(replace_words_with_tags, doc.to_html)
+    puts new_doc
+  end
+
+  def transform_text(replacements, text_to_change)
+    replacements.inject(text_to_change) do |string, mapping|
+      string.gsub(*mapping)
+    end
   end
 
   private
 
-  def replacements
+  def replace_tags_with_words
     {
       /<%=/ => 'OPEN_DISPLAY_BALISE',
       /<%/ => 'OPEN_BALISE',
       /%>/ => 'CLOSE_BALISE '
+    }
+  end
+
+  def replace_words_with_tags
+    {
+      /OPEN_DISPLAY_BALISE/ => '<%=',
+      /OPEN_BALISE/ => '<%',
+      /CLOSE_BALISE/ => '%>'
     }
   end
 end
