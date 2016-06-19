@@ -24,7 +24,11 @@ class Runner
             answer = $stdin.gets.strip
           end
 
-          node.content = "replaced!" if answer == 'y'
+          if answer == 'y'
+            puts 'Enter new ref with only downcase and underscore : For example new_translation_test'
+            new_string = $stdin.gets.strip
+            node.content = "OPEN_DISPLAY_BALISE t(.#{new_string}) CLOSE_BALISE"
+          end
         end
       end
     end
