@@ -61,7 +61,8 @@ class Runner
     {
       /<%=/ => 'OPEN_DISPLAY_BALISE',
       /<%/ => 'OPEN_BALISE',
-      /%>/ => 'CLOSE_BALISE '
+      /%>/ => 'CLOSE_BALISE',
+      /=>/ => 'ARROW'
     }
   end
 
@@ -69,7 +70,8 @@ class Runner
     {
       /OPEN_DISPLAY_BALISE/ => '<%=',
       /OPEN_BALISE/ => '<%',
-      /CLOSE_BALISE/ => '%>'
+      /CLOSE_BALISE/ => '%>',
+      /ARROW/ => '=>'
     }
   end
 end
