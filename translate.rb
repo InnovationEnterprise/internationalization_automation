@@ -33,7 +33,7 @@ class Runner
           if answer == 'y'
             puts 'Enter new ref with only downcase and underscore : For example new_translation_test'
             new_string = $stdin.gets.strip
-            node.content = "OPEN_DISPLAY_BALISE t(.#{new_string}) CLOSE_BALISE"
+            node.content = "OPEN_DISPLAY_BALISE t('.#{new_string}') CLOSE_BALISE"
             translations[new_string] = string
           end
         end
@@ -43,11 +43,10 @@ class Runner
     new_data = {
       FILE_WITH_TRANSLATION.delete('.yml') => { FOLDER_FOR_TRANSLATION => { FILE_NAME => translations } }
     }
-
     File.open(PATH_FOR_TRANSLATION, 'w') { |f| f.write new_data.to_yaml }
 
     new_doc = transform_text(replace_words_with_tags, doc.to_html)
-    puts new_doc
+    File.open(FILE_TO_TRANSLATE, 'w') { |f| f.write new_doc }
   end
 
   def transform_text(replacements, text_to_change)
