@@ -3,6 +3,7 @@ require 'yaml'
 require 'pry'
 
 FILE_TO_TRANSLATE = ARGV[0]
+FILE_NAME = ARGV[0].split('.').first
 PATH_FOR_TRANSLATION = ARGV[1]
 FILE_WITH_TRANSLATION = ARGV[1].split('/').last
 FOLDER_FOR_TRANSLATION = ARGV[1].split('/')[-2]
@@ -14,7 +15,7 @@ class Runner
     file_with_erb_tags_escaped = transform_text(replace_tags_with_words, file_to_translate)
 
     doc = Nokogiri::HTML(file_with_erb_tags_escaped)
-    translations = []
+    translations = {}
 
     doc.traverse do |node|
       if node.class == Nokogiri::XML::Text
@@ -33,13 +34,13 @@ class Runner
             puts 'Enter new ref with only downcase and underscore : For example new_translation_test'
             new_string = $stdin.gets.strip
             node.content = "OPEN_DISPLAY_BALISE t(.#{new_string}) CLOSE_BALISE"
-            translations.push("t(.#{new_string})")
+            translations[new_string] = string
           end
         end
       end
     end
 
-    new_data = { FILE_WITH_TRANSLATION.delete('.yml') => { FOLDER_FOR_TRANSLATION => '' } }
+    new_data = { FILE_WITH_TRANSLATION.delete('.yml') => { FOLDER_FOR_TRANSLATION => { FILE_NAME => translations } } }
     File.open(PATH_FOR_TRANSLATION, 'w') { |f| f.write new_data.to_yaml }
 
     new_doc = transform_text(replace_words_with_tags, doc.to_html)
