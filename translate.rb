@@ -40,7 +40,10 @@ class Runner
       end
     end
 
-    new_data = { FILE_WITH_TRANSLATION.delete('.yml') => { FOLDER_FOR_TRANSLATION => { FILE_NAME => translations } } }
+    new_data = {
+      FILE_WITH_TRANSLATION.delete('.yml') => { FOLDER_FOR_TRANSLATION => { FILE_NAME => translations } }
+    }
+
     File.open(PATH_FOR_TRANSLATION, 'w') { |f| f.write new_data.to_yaml }
 
     new_doc = transform_text(replace_words_with_tags, doc.to_html)
