@@ -14,7 +14,7 @@ class Runner
 
     file_with_erb_tags_escaped = transform_text(replace_tags_with_words, file_to_translate)
 
-    doc = Nokogiri::HTML(file_with_erb_tags_escaped)
+    doc = Nokogiri::HTML.fragment(file_with_erb_tags_escaped)
     translations = {}
 
     doc.traverse do |node|
