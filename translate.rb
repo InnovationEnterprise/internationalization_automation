@@ -41,7 +41,7 @@ class Runner
                 translations[new_string] = old_link
                 link = "t('.#{new_string}')"
               else
-                link
+                "'#{link}'"
               end
             end
         end
