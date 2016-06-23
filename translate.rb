@@ -27,14 +27,9 @@ class Runner
               link = link.chomp('\'').reverse.chomp('\'').reverse
               puts "Change link_to text: < #{link} > [y/n]"
 
-              answer = $stdin.gets.strip
+              @answer = $stdin.gets.strip
 
-              until ['y', 'n'].include?(answer)
-                puts "Answer y or n"
-                answer = $stdin.gets.strip
-              end
-
-              if answer == 'y'
+              if answer_result == 'y'
                 puts 'Enter new ref with only downcase and underscore : For example new_translation_test'
                 new_string = $stdin.gets.strip
                 old_link = link
@@ -48,14 +43,10 @@ class Runner
 
         if (string !~ /OPEN_DISPLAY_BALISE/ && string !~ /OPEN_BALISE/ && string !~ /CLOSE_BALISE/) && string.length > 2
           puts "Change text: < #{string} > [y/n]"
-          answer = $stdin.gets.strip
 
-          until ['y', 'n'].include?(answer)
-            puts "Answer y or n"
-            answer = $stdin.gets.strip
-          end
+          @answer = $stdin.gets.strip
 
-          if answer == 'y'
+          if answer_result == 'y'
             puts 'Enter new ref with only downcase and underscore : For example new_translation_test'
             new_string = $stdin.gets.strip
             node.content = "OPEN_DISPLAY_BALISE t('.#{new_string}') CLOSE_BALISE"
@@ -100,6 +91,14 @@ class Runner
       /ARROW/ => '=>',
       /SPACE/ => '&nbsp;'
     }
+  end
+
+  def answer_result
+    until ['y', 'n'].include?(@answer)
+      puts "Answer y or n"
+      $stdin.gets.strip
+    end
+    @answer
   end
 end
 
