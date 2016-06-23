@@ -21,6 +21,30 @@ class Runner
       if node.class == Nokogiri::XML::Text
         string = node.text.strip
 
+        if string.include?('link_to')
+          node.content =
+            node.text.gsub!(/'.*?(?=,)/) do |link|
+              puts "Change link_to text: < #{link} > [y/n]"
+
+              answer = $stdin.gets.strip
+
+              until ['y', 'n'].include?(answer)
+                puts "Answer y or n"
+                answer = $stdin.gets.strip
+              end
+
+              if answer == 'y'
+                puts 'Enter new ref with only downcase and underscore : For example new_translation_test'
+                new_string = $stdin.gets.strip
+                old_link = link
+                translations[new_string] = old_link
+                link = "t('.#{new_string}')"
+              else
+                link
+              end
+            end
+        end
+
         if (string !~ /OPEN_DISPLAY_BALISE/ && string !~ /OPEN_BALISE/ && string !~ /CLOSE_BALISE/) && string.length > 2
           puts "Change text: < #{string} > [y/n]"
           answer = $stdin.gets.strip
