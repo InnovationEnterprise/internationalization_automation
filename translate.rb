@@ -15,7 +15,7 @@ class Runner
     file_with_erb_tags_escaped = transform_text(replace_tags_with_words, file_to_translate)
 
     doc = Nokogiri::HTML.fragment(file_with_erb_tags_escaped)
-    translations = {}
+    @translations = {}
 
     doc.traverse do |node|
       if node.class == Nokogiri::XML::Text
@@ -24,19 +24,15 @@ class Runner
         if string.include?('link_to')
           node.content =
             node.text.gsub!(/'.*?(?=,)/) do |link|
-              link = link.chomp('\'').reverse.chomp('\'').reverse
-              puts "Change link_to text: < #{link} > [y/n]"
+              @link = link.chomp('\'').reverse.chomp('\'').reverse
+              puts "Change text: < #{@link} > [y/n]"
 
               @answer = $stdin.gets.strip
 
               if answer_result == 'y'
-                puts 'Enter new ref with only downcase and underscore : For example new_translation_test'
-                new_string = $stdin.gets.strip
-                old_link = link
-                translations[new_string] = old_link
-                link = "t('.#{new_string}')"
+                answer_result_logic(node, string)
               else
-                "'#{link}'"
+                "'#{@link}'"
               end
             end
         end
@@ -47,17 +43,14 @@ class Runner
           @answer = $stdin.gets.strip
 
           if answer_result == 'y'
-            puts 'Enter new ref with only downcase and underscore : For example new_translation_test'
-            new_string = $stdin.gets.strip
-            node.content = "OPEN_DISPLAY_BALISE t('.#{new_string}') CLOSE_BALISE"
-            translations[new_string] = string
+            answer_result_logic(node, string)
           end
         end
       end
     end
 
     new_data = {
-      FILE_WITH_TRANSLATION.delete('.yml') => { FOLDER_FOR_TRANSLATION => { FILE_NAME => translations } }
+      FILE_WITH_TRANSLATION.delete('.yml') => { FOLDER_FOR_TRANSLATION => { FILE_NAME => @translations } }
     }
     File.open(PATH_FOR_TRANSLATION, 'w') { |f| f.write new_data.to_yaml }
 
@@ -99,6 +92,20 @@ class Runner
       $stdin.gets.strip
     end
     @answer
+  end
+
+  def answer_result_logic(node, string)
+    puts 'Enter new ref with only downcase and underscore : For example new_translation_test'
+    new_string = $stdin.gets.strip
+
+    if !@link.nil?
+      old_link = @link
+      @translations[new_string] = old_link
+      "t('.#{new_string}')"
+    else
+      node.content = "OPEN_DISPLAY_BALISE t('.#{new_string}') CLOSE_BALISE"
+      @translations[new_string] = string
+    end
   end
 end
 
