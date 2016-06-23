@@ -24,6 +24,7 @@ class Runner
         if string.include?('link_to')
           node.content =
             node.text.gsub!(/'.*?(?=,)/) do |link|
+              link = link.chomp('\'').reverse.chomp('\'').reverse
               puts "Change link_to text: < #{link} > [y/n]"
 
               answer = $stdin.gets.strip
