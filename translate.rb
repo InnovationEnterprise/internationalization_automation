@@ -25,7 +25,7 @@ class Runner
           node.content =
             node.text.gsub!(/'.*?(?=,)/) do |link|
               @link = link.chomp('\'').reverse.chomp('\'').reverse
-              puts "Change text: < #{@link} > [y/n]"
+              ask_for_text_change(@link)
               @answer = $stdin.gets.strip
 
               if positive_answer?
@@ -36,8 +36,8 @@ class Runner
             end
         end
 
-        if (string !~ /OPEN_DISPLAY_BALISE/ && string !~ /OPEN_BALISE/ && string !~ /CLOSE_BALISE/) && string.length > 2
-          puts "Change text: < #{string} > [y/n]"
+        if text_for_translation?(string)
+          ask_for_text_change(string)
           @answer = $stdin.gets.strip
           answer_result_logic(node, string) if positive_answer?
         end
@@ -60,6 +60,10 @@ class Runner
   end
 
   private
+
+  def text_for_translation?(string)
+    (string !~ /OPEN_DISPLAY_BALISE/ && string !~ /OPEN_BALISE/ && string !~ /CLOSE_BALISE/) && string.length > 2
+  end
 
   def replace_tags_with_words
     {
@@ -91,6 +95,10 @@ class Runner
 
   def positive_answer?
     answer_result == 'y'
+  end
+
+  def ask_for_text_change(string)
+    puts "Change text: < #{string} > [y/n]"
   end
 
   def answer_result_logic(node, string)
