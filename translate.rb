@@ -11,9 +11,7 @@ FOLDER_FOR_TRANSLATION = ARGV[1].split('/')[-2]
 class Runner
   def parse
     file_to_translate = File.read(FILE_TO_TRANSLATE)
-
     file_with_erb_tags_escaped = transform_text(replace_tags_with_words, file_to_translate)
-
     doc = Nokogiri::HTML.fragment(file_with_erb_tags_escaped)
     @translations = {}
 
@@ -47,10 +45,9 @@ class Runner
     new_data = {
       FILE_WITH_TRANSLATION.delete('.yml') => { FOLDER_FOR_TRANSLATION => { FILE_NAME => @translations } }
     }
-    File.open(PATH_FOR_TRANSLATION, 'w') { |f| f.write new_data.to_yaml }
-
+    overwrite_file(PATH_FOR_TRANSLATION, new_data.to_yaml)
     new_doc = transform_text(replace_words_with_tags, doc.to_html)
-    File.open(FILE_TO_TRANSLATE, 'w') { |f| f.write new_doc }
+    overwrite_file(FILE_TO_TRANSLATE, new_doc)
   end
 
   def transform_text(replacements, text_to_change)
@@ -60,6 +57,10 @@ class Runner
   end
 
   private
+
+  def overwrite_file(path, new_data)
+    File.open(path, 'w') { |f| f.write new_data }
+  end
 
   def text_for_translation?
     (@string !~ /OPEN_DISPLAY_BALISE/ && @string !~ /OPEN_BALISE/ && @string !~ /CLOSE_BALISE/) && @string.length > 2
