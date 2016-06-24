@@ -19,9 +19,9 @@ class Runner
 
     doc.traverse do |node|
       if node.class == Nokogiri::XML::Text
-        string = node.text.strip
+        @string = node.text.strip
 
-        if string.include?('link_to')
+        if @string.include?('link_to')
           node.content =
             node.text.gsub!(/'.*?(?=,)/) do |link|
               @link = link.chomp('\'').reverse.chomp('\'').reverse
@@ -29,17 +29,17 @@ class Runner
               @answer = $stdin.gets.strip
 
               if positive_answer?
-                answer_result_logic(node, string)
+                answer_result_logic(node)
               else
                 "'#{@link}'"
               end
             end
         end
 
-        if text_for_translation?(string)
-          ask_for_text_change(string)
+        if text_for_translation?
+          ask_for_text_change(@string)
           @answer = $stdin.gets.strip
-          answer_result_logic(node, string) if positive_answer?
+          answer_result_logic(node) if positive_answer?
         end
       end
     end
@@ -61,8 +61,8 @@ class Runner
 
   private
 
-  def text_for_translation?(string)
-    (string !~ /OPEN_DISPLAY_BALISE/ && string !~ /OPEN_BALISE/ && string !~ /CLOSE_BALISE/) && string.length > 2
+  def text_for_translation?
+    (@string !~ /OPEN_DISPLAY_BALISE/ && @string !~ /OPEN_BALISE/ && @string !~ /CLOSE_BALISE/) && @string.length > 2
   end
 
   def replace_tags_with_words
@@ -101,7 +101,7 @@ class Runner
     puts "Change text: < #{string} > [y/n]"
   end
 
-  def answer_result_logic(node, string)
+  def answer_result_logic(node)
     puts 'Enter new ref with only downcase and underscore : For example new_translation_test'
     new_string = $stdin.gets.strip
 
@@ -111,7 +111,7 @@ class Runner
       "t('.#{new_string}')"
     else
       node.content = "OPEN_DISPLAY_BALISE t('.#{new_string}') CLOSE_BALISE"
-      @translations[new_string] = string
+      @translations[new_string] = @string
     end
   end
 end
