@@ -22,7 +22,7 @@ class Runner
         if @string.include?('link_to')
           node.content =
             node.text.gsub!(/'.*?(?=,)/) do |link|
-              @link = link.chomp('\'').reverse.chomp('\'').reverse
+              @link = link.chop.reverse.chop.reverse #remove single quotes at the beginning and end of string
               ask_for_text_change(@link)
               @answer = $stdin.gets.strip
 
