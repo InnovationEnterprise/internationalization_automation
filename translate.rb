@@ -3,75 +3,51 @@ require 'yaml'
 require 'pry'
 
 FILE_TO_TRANSLATE = ARGV[0]
-FILE_NAME = ARGV[0].split('.').first
+FILE_NAME = ARGV[0].split('/').last.split('.').first
 PATH_FOR_TRANSLATION = ARGV[1]
-FILE_WITH_TRANSLATION = ARGV[1].split('/').last
+FILE_WITH_TRANSLATION = ARGV[1].split('/').last.split('.').first
 FOLDER_FOR_TRANSLATION = ARGV[1].split('/')[-2]
 
 class Runner
   def parse
     file_to_translate = File.read(FILE_TO_TRANSLATE)
-
     file_with_erb_tags_escaped = transform_text(replace_tags_with_words, file_to_translate)
-
     doc = Nokogiri::HTML.fragment(file_with_erb_tags_escaped)
-    translations = {}
+    @translations = {}
 
     doc.traverse do |node|
       if node.class == Nokogiri::XML::Text
-        string = node.text.strip
+        @string = node.text.strip
 
-        if string.include?('link_to')
+        if @string.include?('link_to')
           node.content =
             node.text.gsub!(/'.*?(?=,)/) do |link|
-              link = link.chomp('\'').reverse.chomp('\'').reverse
-              puts "Change link_to text: < #{link} > [y/n]"
+              @link = link.chop.reverse.chop.reverse #remove single quotes at the beginning and end of string
+              ask_for_text_change(@link)
+              @answer = $stdin.gets.strip
 
-              answer = $stdin.gets.strip
-
-              until ['y', 'n'].include?(answer)
-                puts "Answer y or n"
-                answer = $stdin.gets.strip
-              end
-
-              if answer == 'y'
-                puts 'Enter new ref with only downcase and underscore : For example new_translation_test'
-                new_string = $stdin.gets.strip
-                old_link = link
-                translations[new_string] = old_link
-                link = "t('.#{new_string}')"
+              if positive_answer?
+                answer_result_logic(node)
               else
-                "'#{link}'"
+                "'#{@link}'"
               end
             end
         end
 
-        if (string !~ /OPEN_DISPLAY_BALISE/ && string !~ /OPEN_BALISE/ && string !~ /CLOSE_BALISE/) && string.length > 2
-          puts "Change text: < #{string} > [y/n]"
-          answer = $stdin.gets.strip
-
-          until ['y', 'n'].include?(answer)
-            puts "Answer y or n"
-            answer = $stdin.gets.strip
-          end
-
-          if answer == 'y'
-            puts 'Enter new ref with only downcase and underscore : For example new_translation_test'
-            new_string = $stdin.gets.strip
-            node.content = "OPEN_DISPLAY_BALISE t('.#{new_string}') CLOSE_BALISE"
-            translations[new_string] = string
-          end
+        if text_for_translation?
+          ask_for_text_change(@string)
+          @answer = $stdin.gets.strip
+          answer_result_logic(node) if positive_answer?
         end
       end
     end
 
     new_data = {
-      FILE_WITH_TRANSLATION.delete('.yml') => { FOLDER_FOR_TRANSLATION => { FILE_NAME => translations } }
+      FILE_WITH_TRANSLATION => { FOLDER_FOR_TRANSLATION => { FILE_NAME => @translations } }
     }
-    File.open(PATH_FOR_TRANSLATION, 'w') { |f| f.write new_data.to_yaml }
-
+    overwrite_file(PATH_FOR_TRANSLATION, new_data.to_yaml)
     new_doc = transform_text(replace_words_with_tags, doc.to_html)
-    File.open(FILE_TO_TRANSLATE, 'w') { |f| f.write new_doc }
+    overwrite_file(FILE_TO_TRANSLATE, new_doc)
   end
 
   def transform_text(replacements, text_to_change)
@@ -81,6 +57,14 @@ class Runner
   end
 
   private
+
+  def overwrite_file(path, new_data)
+    File.open(path, 'w') { |f| f.write new_data }
+  end
+
+  def text_for_translation?
+    (@string !~ /OPEN_DISPLAY_BALISE/ && @string !~ /OPEN_BALISE/ && @string !~ /CLOSE_BALISE/) && @string.length > 2
+  end
 
   def replace_tags_with_words
     {
@@ -100,6 +84,36 @@ class Runner
       /ARROW/ => '=>',
       /SPACE/ => '&nbsp;'
     }
+  end
+
+  def answer_result
+    until ['y', 'n'].include?(@answer)
+      puts "Answer y or n"
+      $stdin.gets.strip
+    end
+    @answer
+  end
+
+  def positive_answer?
+    answer_result == 'y'
+  end
+
+  def ask_for_text_change(string)
+    puts "\nChange text: < #{string} > [y/n]"
+  end
+
+  def answer_result_logic(node)
+    puts "\nEnter new reference with only downcase and underscore : For example new_translation_test"
+    new_string = $stdin.gets.strip
+
+    if !@link.nil?
+      old_link = @link
+      @translations[new_string] = old_link
+      "t('.#{new_string}')"
+    else
+      node.content = "OPEN_DISPLAY_BALISE t('.#{new_string}') CLOSE_BALISE"
+      @translations[new_string] = @string
+    end
   end
 end
 
