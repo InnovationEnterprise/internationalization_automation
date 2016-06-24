@@ -99,11 +99,11 @@ class Runner
   end
 
   def ask_for_text_change(string)
-    puts "Change text: < #{string} > [y/n]"
+    puts "\nChange text: < #{string} > [y/n]"
   end
 
   def answer_result_logic(node)
-    puts 'Enter new ref with only downcase and underscore : For example new_translation_test'
+    puts "\nEnter new reference with only downcase and underscore : For example new_translation_test"
     new_string = $stdin.gets.strip
 
     if !@link.nil?
