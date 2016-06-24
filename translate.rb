@@ -26,10 +26,9 @@ class Runner
             node.text.gsub!(/'.*?(?=,)/) do |link|
               @link = link.chomp('\'').reverse.chomp('\'').reverse
               puts "Change text: < #{@link} > [y/n]"
-
               @answer = $stdin.gets.strip
 
-              if answer_result == 'y'
+              if positive_answer?
                 answer_result_logic(node, string)
               else
                 "'#{@link}'"
@@ -39,12 +38,8 @@ class Runner
 
         if (string !~ /OPEN_DISPLAY_BALISE/ && string !~ /OPEN_BALISE/ && string !~ /CLOSE_BALISE/) && string.length > 2
           puts "Change text: < #{string} > [y/n]"
-
           @answer = $stdin.gets.strip
-
-          if answer_result == 'y'
-            answer_result_logic(node, string)
-          end
+          answer_result_logic(node, string) if positive_answer?
         end
       end
     end
@@ -92,6 +87,10 @@ class Runner
       $stdin.gets.strip
     end
     @answer
+  end
+
+  def positive_answer?
+    answer_result == 'y'
   end
 
   def answer_result_logic(node, string)
