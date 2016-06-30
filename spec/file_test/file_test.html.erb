@@ -1,0 +1,54 @@
+<% content_for :background_media_queries do %>
+  <%= render 'shared/background_image_styles', images: { 'superbg' => @test.double_test }, test: @test %>
+<% end %>
+
+<% content_for :title do %>
+  Registration - <%= @test.page_title %>
+<% end %>
+
+<% if test? %>
+  <span class="user_email"><%= test.email %></span>&nbsp;|
+  <% if test.is_admin %>
+    <%= link_to 'Admin', admin_path %>&nbsp;|
+  <% end %>
+  &nbsp;<%= link_to 'Log Out', test_sign_out_path %>
+<% else %>
+  <%= link_to 'Log In', test_session_path, class: 'btn btn-small' %>
+<% end %>
+
+<div id="superbg">
+  <section id="registration" style="border-left-color: <%= @test.hello_world %>; color: <%= @test.color.downcase %>; margin-bottom:0; padding-bottom:0;" class="gradient nobefore">
+  <div class="body" style="margin-bottom:0; padding-bottom:0;">
+    <div class="test-title">
+      <h1 class="summary"><%= @test.title %></h1>
+      <h2 class="summary-details"><%= @test.single_range us_format: true %>, <%= @test.song %>, <%= @test.year %></h2>
+    </div>
+    <ul class="links">
+      <li><%= @test.request(:download, t('contact.reasons')) %></li>
+      <%= @test.convince_link_item %>
+    </ul>
+    <section class="registration-details">
+    <% if @test.registration? %>
+      <h1>Register Today</h1>
+      <div class="description">
+        <p><%= sanitize(@test.registration) %></p>
+      </div>
+    <% else %>
+      <h1>No registration present.</h1>
+    <% end %>
+    </section>
+  </div>
+  </section>
+
+  <section id="tito" class="nobefore" style="border-left-color: <%= @test.colour %>; color: <%= @test.color.downcase %>;">
+  <div class="body">
+    <div id="super" style="background: #fff; padding-bottom: 30px;margin: auto;">
+      <tito-widget source="<%= params[:source] %>" test="<%= @test.tito %>" discount-code="<%= cookies["ie-#{@test.slug}"] %>"></tito-widget>
+      <link rel="stylesheet" type="text/css" href="//io/v1" />
+      <script src="https://io/v1"></script>
+      <small class="registration-small"><sup>*</sup> Availability may be limited by approval or submission</small>
+    </div>
+  </div>
+  </section>
+</div>
+
