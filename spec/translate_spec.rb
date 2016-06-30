@@ -9,15 +9,43 @@ describe Runner do
   let!(:old_html_file) { File.read(file_to_translate) }
   let!(:old_yml_file) { File.read(path_for_translation) }
 
+  before(:each) do
+    InputFaker.with_fake_input(['y', 'admin_path', 'y', 'log_out_path', 'n', 'y', 'register_today', 'y', 'no_registration_present', 'n']) do
+    runner = Runner.new
+      runner.parse(file_to_translate, file_name, path_for_translation, file_with_translation, folder_for_translation)
+    end
+  end
+
   after(:each) do
     File.open(file_to_translate, 'w') { |f| f.write old_html_file }
     File.open(path_for_translation, 'w') { |f| f.write old_yml_file }
   end
 
-  it 'works properly' do
-    runner = Runner.new
-    InputFaker.with_fake_input(['y', 'admin_path', 'y', 'log_out_path', 'y', 'log_in', 'y', 'register_today', 'y', 'no_registration_present', 'y', 'avaibility_limited' ]) do
-      runner.parse(file_to_translate, file_name, path_for_translation, file_with_translation, folder_for_translation)
+  context 'after runner parses html.erb file' do
+    let!(:new_html_file) { File.read(file_to_translate) }
+
+    it "replaces link_to 'Admin' with admin_path" do
+      expect(new_html_file).to include("<%= link_to t('.admin_path'), admin_path %>")
+    end
+
+    it "replaces link_to 'Log Out' with log_out_path" do
+      expect(new_html_file).to include("<%= link_to t('.log_out_path'), test_sign_out_path %>")
+    end
+
+    it 'not replaces link_to Log In' do
+      expect(new_html_file).to include("<%= link_to 'Log In', test_session_path, class: 'btn btn-small' %>")
+    end
+
+    it "replaces 'Register Today' with register_today" do
+      expect(new_html_file).to include("<h1><%= t('.register_today') %></h1>")
+    end
+
+    it "replaces 'No registration present' with no_registration_present" do
+      expect(new_html_file).to include("<h1><%= t('.no_registration_present') %></h1>")
+    end
+
+    it "not replaces 'Availability may be limited by approval or submission'" do
+      expect(new_html_file).to include("</sup> Availability may be limited by approval or submission</small>")
     end
   end
 end

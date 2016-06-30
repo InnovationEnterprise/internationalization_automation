@@ -39,6 +39,7 @@ class Runner
         if text_for_translation?
           ask_for_text_change(@string)
           @answer = $stdin.gets.strip
+          @link = nil
           answer_result_logic(node) if positive_answer?
         end
       end
