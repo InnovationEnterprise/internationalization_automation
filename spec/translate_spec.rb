@@ -47,5 +47,14 @@ describe Runner do
     it "not replaces 'Availability may be limited by approval or submission'" do
       expect(new_html_file).to include("</sup> Availability may be limited by approval or submission</small>")
     end
+
+    it 'sets en.yml file with values from file_test.html.erb file' do
+      new_yml_file = File.read(path_for_translation)
+      expect(new_yml_file).to eql("---\nen:\n  test:\n    file_test:\n      admin_path: Admin\n      log_out_path: Log Out\n      register_today: Register Today\n      no_registration_present: No registration present.\n")
+    end
+
+    it 'keeps &nbsp tags' do
+      expect(new_html_file).to include('&nbsp;')
+    end
   end
 end
