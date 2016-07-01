@@ -90,11 +90,13 @@ class Runner
   end
 
   def answer_result
-    until ['y', 'n'].include?(@answer)
+    if @answer != 'y' && @answer != 'n'
       puts "Answer y or n"
-      $stdin.gets.strip
+      @answer = $stdin.gets.strip
+      answer_result
+    else
+      @answer
     end
-    @answer
   end
 
   def positive_answer?
