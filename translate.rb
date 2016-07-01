@@ -1,6 +1,7 @@
 require 'yaml'
 require 'pry'
 require 'nokogiri'
+require 'colorize'
 
 if !ARGV.include?("spec/translate_spec.rb")
   FILE_TO_TRANSLATE = ARGV[0]
@@ -29,7 +30,7 @@ class Runner
               @answer = $stdin.gets.strip
 
               if positive_answer?
-                answer_result_logic(node)
+                answer_result_logic(node, @link)
               else
                 "'#{@link}'"
               end
@@ -40,7 +41,7 @@ class Runner
           ask_for_text_change(@string)
           @answer = $stdin.gets.strip
           @link = nil
-          answer_result_logic(node) if positive_answer?
+          answer_result_logic(node, @string) if positive_answer?
         end
       end
     end
@@ -51,6 +52,7 @@ class Runner
     overwrite_file(path_for_translation, new_data.to_yaml)
     new_doc = transform_text(replace_words_with_tags, doc.to_html)
     overwrite_file(file_to_translate, new_doc)
+    puts 'Modifications completed!'.colorize(:green)
   end
 
   def transform_text(replacements, text_to_change)
@@ -91,7 +93,7 @@ class Runner
 
   def answer_result
     if @answer != 'y' && @answer != 'n'
-      puts "Answer y or n"
+      puts "Answer y or n".colorize(:yellow)
       @answer = $stdin.gets.strip
       answer_result
     else
@@ -104,16 +106,24 @@ class Runner
   end
 
   def ask_for_text_change(string)
-    puts "\nChange text: < #{string} > [y/n]"
+    puts "\nChange text: < #{string.colorize(:cyan)} > [y/n]"
   end
 
-  def answer_result_logic(node)
-    puts "\nEnter new reference with only downcase and underscore : For example new_translation_test"
+  def answer_result_logic(node, text_to_change)
+    @file_to_translate.each_line("\n") do |line|
+      if line.include?(text_to_change)
+        print line.colorize(:light_green)
+      else
+        print line.colorize(:light_red)
+      end
+    end
+    puts "\nEnter new reference for < #{text_to_change.colorize(:cyan)} > with only downcase and underscore : For example new_translation_test"
     new_string = $stdin.gets.strip
 
     if (new_string =~ /^[a-z_]+$/).nil?
-      puts "\nError : Wrong format"
-      answer_result_logic(node)
+      puts "\nError : Wrong format".colorize(:red)
+      sleep(1)
+      answer_result_logic(node, text_to_change)
     end
 
     if !@link.nil?
