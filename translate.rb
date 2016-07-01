@@ -111,6 +111,11 @@ class Runner
     puts "\nEnter new reference with only downcase and underscore : For example new_translation_test"
     new_string = $stdin.gets.strip
 
+    if (new_string =~ /^[a-z_]+$/).nil?
+      puts "\nError : Wrong format"
+      answer_result_logic(node)
+    end
+
     if !@link.nil?
       old_link = @link
       @translations[new_string] = old_link
