@@ -1,17 +1,19 @@
-require 'nokogiri'
 require 'yaml'
 require 'pry'
+require 'nokogiri'
 
-FILE_TO_TRANSLATE = ARGV[0]
-FILE_NAME = ARGV[0].split('/').last.split('.').first
-PATH_FOR_TRANSLATION = ARGV[1]
-FILE_WITH_TRANSLATION = ARGV[1].split('/').last.split('.').first
-FOLDER_FOR_TRANSLATION = ARGV[1].split('/')[-2]
+if !ARGV.include?("spec/translate_spec.rb")
+  FILE_TO_TRANSLATE = ARGV[0]
+  FILE_NAME = ARGV[0].split('/').last.split('.').first
+  PATH_FOR_TRANSLATION = ARGV[1]
+  FILE_WITH_TRANSLATION = ARGV[1].split('/').last.split('.').first
+  FOLDER_FOR_TRANSLATION = ARGV[1].split('/')[-2]
+end
 
 class Runner
-  def parse
-    file_to_translate = File.read(FILE_TO_TRANSLATE)
-    file_with_erb_tags_escaped = transform_text(replace_tags_with_words, file_to_translate)
+  def parse(file_to_translate, file_name, path_for_translation, file_with_translation, folder_for_translation)
+    @file_to_translate = File.read(file_to_translate)
+    file_with_erb_tags_escaped = transform_text(replace_tags_with_words, @file_to_translate)
     doc = Nokogiri::HTML.fragment(file_with_erb_tags_escaped)
     @translations = {}
 
@@ -37,17 +39,18 @@ class Runner
         if text_for_translation?
           ask_for_text_change(@string)
           @answer = $stdin.gets.strip
+          @link = nil
           answer_result_logic(node) if positive_answer?
         end
       end
     end
 
     new_data = {
-      FILE_WITH_TRANSLATION => { FOLDER_FOR_TRANSLATION => { FILE_NAME => @translations } }
+      file_with_translation => { folder_for_translation => { file_name => @translations } }
     }
-    overwrite_file(PATH_FOR_TRANSLATION, new_data.to_yaml)
+    overwrite_file(path_for_translation, new_data.to_yaml)
     new_doc = transform_text(replace_words_with_tags, doc.to_html)
-    overwrite_file(FILE_TO_TRANSLATE, new_doc)
+    overwrite_file(file_to_translate, new_doc)
   end
 
   def transform_text(replacements, text_to_change)
@@ -87,11 +90,13 @@ class Runner
   end
 
   def answer_result
-    until ['y', 'n'].include?(@answer)
+    if @answer != 'y' && @answer != 'n'
       puts "Answer y or n"
-      $stdin.gets.strip
+      @answer = $stdin.gets.strip
+      answer_result
+    else
+      @answer
     end
-    @answer
   end
 
   def positive_answer?
@@ -117,4 +122,4 @@ class Runner
   end
 end
 
-Runner.new.parse
+Runner.new.parse(FILE_TO_TRANSLATE, FILE_NAME, PATH_FOR_TRANSLATION, FILE_WITH_TRANSLATION, FOLDER_FOR_TRANSLATION) if !ARGV.include?("spec/translate_spec.rb")
