@@ -11,7 +11,7 @@ describe Runner do
 
   before(:each) do
     InputFaker.with_fake_input(['y', 'admin_path', 'y', 'log_out_path', 'n', 'y', 'register_today', 'y', 'no_registration_present', 'n']) do
-    runner = Runner.new
+      runner = Runner.new
       runner.parse(file_to_translate, file_name, path_for_translation, file_with_translation, folder_for_translation)
     end
   end
