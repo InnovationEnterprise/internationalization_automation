@@ -114,6 +114,9 @@ class Runner
       @translations.each do |key, value|
         if line.include?(value)
           line.gsub!(/#{value}/, "t('.#{key}')")
+          if line.include?('link_to')
+            line.gsub!(/('t.+\)')/, line[/('t.+\)')/].chop.reverse.chop.reverse)
+          end
         end
       end
       if line.include?(text_to_change)
