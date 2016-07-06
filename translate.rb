@@ -111,12 +111,20 @@ class Runner
 
   def answer_result_logic(node, text_to_change)
     @file_to_translate.each_line("\n") do |line|
+      @translations.each do |key, value|
+        if line.include?(value)
+          line.gsub!(/#{value}/, "t('.#{key}')")
+        end
+      end
       if line.include?(text_to_change)
         print line.colorize(:light_green)
+      elsif line.include?("t('.")
+        print line.colorize(:light_yellow)
       else
         print line.colorize(:light_red)
       end
     end
+
     puts "\nEnter new reference for < #{text_to_change.colorize(:cyan)} > with only downcase and underscore : For example new_translation_test"
     new_string = $stdin.gets.strip
 
