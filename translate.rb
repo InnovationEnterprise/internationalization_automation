@@ -77,7 +77,9 @@ class Runner
       /<%/ => 'OPEN_BALISE',
       /%>/ => 'CLOSE_BALISE',
       /=>/ => 'ARROW',
-      /&nbsp;/ => 'SPACE'
+      /&nbsp;/ => 'SPACE',
+      /(\[")/ => 'OPEN_INTER',
+      /(\"\])/ => 'CLOSE_INTER'
     }
   end
 
@@ -87,7 +89,9 @@ class Runner
       /OPEN_BALISE/ => '<%',
       /CLOSE_BALISE/ => '%>',
       /ARROW/ => '=>',
-      /SPACE/ => '&nbsp;'
+      /SPACE/ => '&nbsp;',
+      /OPEN_INTER/ => '["',
+      /CLOSE_INTER/ => '"]'
     }
   end
 
