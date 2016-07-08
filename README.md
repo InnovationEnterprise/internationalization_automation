@@ -4,10 +4,10 @@ Internationalization Automation
 ![Alt text](./internationalization_automation.gif?raw=true "Internationalization Automation")
 
 ### Notice / Important
-I can't guarantee this script will works fine every time. So you should be careful and always use this tool when you are working on a git branch other than master.
+I can't guarantee this script will work every time. So you should be careful and always use this tool with a backup. For example, create a copy of your yml or html.erb file / work on a git branch.
 
 ### Why I created this script ?
-One of the Roadmap feature that I'm working on (for my company) is related to app internationalization. I have to translate one of our app with chinese language. This stuff can be really long and boring because you have to change manually each hardcoded string and put the reference inside a yml file. In that way, you can easily forget an hardcoded string or replace it with a wrongly reference. As a developer, I thought it could be fun and useful to automate that. I hope this script will help or inspire other developers to automate things.
+One of the Roadmap features that I'm working on (for my company) is related to internationalization. I have to translate one of our apps to chinese. This stuff can be really long and boring because you have to change manually each hardcoded string and put the reference inside a yml file. In that way, you can easily forget an hardcoded string or replace it with a wrong reference. As a developer, I thought it could be fun and useful to automate that. I hope this script will help or inspire other developers to automate things.
 
 ### How to use this script
 
