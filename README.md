@@ -15,9 +15,9 @@ One of the Roadmap features that I'm working on (for my company) is related to i
 * Choose the file where the translation should happen. At the moment, only `html.erb` files are allowed
 * Choose the `.yml` file where all references will be added.
 * Run `ruby translate <path to erb file> <path to yml file>` cmd
-* For example inside the script repo, run the cmd below
-* `ruby translate ../../rails_projects/ie-events/app/views/contact_form/index.html.erb ../../rails_projects/ie-events/config/locales/views/contact_form/en.yml`. (Notice that you should organize your yml files in that way => config/locales/views/<views folder name>/en.yml|es.yml|zh-CN.yml|...)
-* You will see a prompt asking you different questions, you have just to follow instructions
+     - For example inside the script repo, run the cmd below
+     - `ruby translate ../../rails_projects/ie-events/app/views/contact_form/index.html.erb ../../rails_projects/ie-events/config/locales/views/contact_form/en.yml`. (Notice that you should organize your yml files in that way => config/locales/views/<views folder name>/en.yml|es.yml|zh-CN.yml|...)
+* You will see a prompt, asking you different questions. You have just to follow instructions
 * Once translation is done, you should verify both files to check if nothing went wrong
 
 Enjoy !!!
