@@ -106,7 +106,8 @@ class Runner
   end
 
   def ask_for_text_change(string)
-    puts "\nChange text: < #{string.colorize(:cyan)} > [y/n]"
+    string_for_prompt = string.clone
+    puts "\nChange text: < #{string_for_prompt.colorize(:cyan)} > [y/n]"
   end
 
   def answer_result_logic(node, text_to_change)
@@ -128,7 +129,8 @@ class Runner
       end
     end
 
-    puts "\nEnter new reference for < #{text_to_change.colorize(:cyan)} > with only downcase and underscore : For example new_translation_test"
+    string_for_prompt = text_to_change.clone
+    puts "\nEnter new reference for < #{string_for_prompt.colorize(:cyan)} > with only downcase and underscore : For example new_translation_test"
     new_string = $stdin.gets.strip
 
     if (new_string =~ /^[a-z_]+$/).nil?
