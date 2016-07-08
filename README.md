@@ -1,6 +1,8 @@
 Internationalization Automation
 ====
 
+![Alt text](./internationalization_automation.gif?raw=true "Internationalization Automation")
+
 ### Notice / Important
 I can guarantee this script will work fine at 100%. The code isn't really clean, robust, etc... So you should be careful and use some backups like a git branch other than master
 
